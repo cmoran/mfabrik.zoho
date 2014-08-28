@@ -25,13 +25,13 @@ from core import Connection, ZohoException, decode_json
 class CRM(Connection):
     """ CRM specific Zoho APIs mapped to Python """
     
-    def _parse_json_response(self, data):
+    def _parse_json_response(self, data, module="Leads"):
         if data["response"].get("nodata"):
             return []
         
         # Sanify output data to more Python-like format
         output = []
-        rows = data["response"]["result"]["Leads"]["row"]
+        rows = data["response"]["result"][module]["row"]
         # If single item returned
         if type(rows) == dict:
             rows = [rows]
@@ -115,7 +115,7 @@ class CRM(Connection):
         
         return self.get_inserted_records(response)
     
-    def get_records(self, selectColumns='leads(First Name,Last Name,Company)', parameters={}):
+    def get_records(self, module="Leads", selectColumns='leads(First Name,Last Name,Company)', parameters={}):
         """ 
         
         http://zohocrmapi.wiki.zoho.com/getRecords-Method.html
@@ -139,14 +139,14 @@ class CRM(Connection):
         
         post_params.update(parameters)
         
-        response = self.do_call("https://crm.zoho.com/crm/private/json/Leads/getRecords", post_params)
+        response = self.do_call("https://crm.zoho.com/crm/private/json/" + module + "/getRecords", post_params)
         
         # raw data looks like {'response': {'result': {'Leads': {'row': [{'FL': [{'content': '177376000000142085', 'val': 'LEADID'}, ...
         data =  decode_json(response)
         
-        return self._parse_json_response(data)
+        return self._parse_json_response(data, module)
     
-    def delete_record(self, id, parameters={}):
+    def delete_record(self, id, module="Leads", parameters={}):
         """ Delete one record from Zoho CRM.
         
         @param id: Record id
@@ -159,7 +159,7 @@ class CRM(Connection):
         post_params["id"] = id
         post_params.update(parameters)
         
-        response = self.do_call("https://crm.zoho.com/crm/private/xml/Leads/deleteRecords", post_params)
+        response = self.do_call("https://crm.zoho.com/crm/private/xml/" + module + "/deleteRecords", post_params)
         
         self.check_successful_xml(response)
     
@@ -189,7 +189,7 @@ class CRM(Connection):
         
         self.check_successful_xml(response)
     
-    def get_record_by_id(self, id):
+    def get_record_by_id(self, id, module="Leads"):
         """
         
         https://www.zoho.com/crm/help/api/getrecordbyid.html
@@ -207,16 +207,16 @@ class CRM(Connection):
             "newFormat" : 2
         }
         
-        response = self.do_call("https://crm.zoho.com/crm/private/json/Leads/getRecordById", post_params)
+        response = self.do_call("https://crm.zoho.com/crm/private/json/" + module + "/getRecordById", post_params)
         
         # raw data looks like {'response': {'result': {'Leads': {'row': [{'FL': [{'content': '177376000000142085', 'val': 'LEADID'}, ...
         data =  decode_json(response)
         
-        parsed = self._parse_json_response(data)
+        parsed = self._parse_json_response(data, module)
         
         return parsed[0] if len(parsed) else None
     
-    def search_records(self, searchCondition, selectColumns='leads(First Name,Last Name,Company)'):
+    def search_records(self, searchCondition, module="Leads", selectColumns='leads(First Name,Last Name,Company)'):
         """
         
         https://www.zoho.com/crm/help/api/getsearchrecords.html
@@ -238,14 +238,14 @@ class CRM(Connection):
             "newFormat" : 2
         }
         
-        response = self.do_call("https://crm.zoho.com/crm/private/json/Leads/getSearchRecords", post_params)
+        response = self.do_call("https://crm.zoho.com/crm/private/json/" + module + "/getSearchRecords", post_params)
         
         # raw data looks like {'response': {'result': {'Leads': {'row': [{'FL': [{'content': '177376000000142085', 'val': 'LEADID'}, ...
         data =  decode_json(response)
         
-        return self._parse_json_response(data)
+        return self._parse_json_response(data, module)
     
-    def search_records_pdc(self, searchColumn, searchValue, selectColumns='leads(First Name,Last Name,Company)'):
+    def search_records_pdc(self, searchColumn, searchValue, module="Leads", selectColumns='leads(First Name,Last Name,Company)'):
         """
         
         https://www.zoho.com/crm/help/api/getsearchrecordsbypdc.html
@@ -270,9 +270,9 @@ class CRM(Connection):
             "newFormat" : 2
         }
         
-        response = self.do_call("https://crm.zoho.com/crm/private/json/Leads/getSearchRecordsByPDC", post_params)
+        response = self.do_call("https://crm.zoho.com/crm/private/json/" + module + "/getSearchRecordsByPDC", post_params)
         
         # raw data looks like {'response': {'result': {'Leads': {'row': [{'FL': [{'content': '177376000000142085', 'val': 'LEADID'}, ...
         data =  decode_json(response)
         
-        return self._parse_json_response(data)
+        return self._parse_json_response(data, module)

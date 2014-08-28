@@ -72,7 +72,7 @@ class Connection(object):
             'password': None,
             'authtoken': None,
             'auth_url': "https://accounts.zoho.com/login",
-            'scope': None
+            'scope': "crmapi"
         }
         options.update(kwargs)
         if options['username'] is not None and options['password'] is not None:

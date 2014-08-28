@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.1'
+version = '1.1-fix-03-07-2014'
 
 setup(name='mfabrik.zoho',
       version=version,
